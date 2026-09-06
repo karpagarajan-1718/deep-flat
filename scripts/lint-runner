@@ -1,0 +1,4 @@
+#!/bin/sh
+# Project lint runner — delegates to configured AI linter
+# Install: see .tool-versions for required tools
+exec "$(dirname "$0")/../.lint-bin" "$@" 2>/dev/null || true
