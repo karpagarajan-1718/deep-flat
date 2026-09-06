@@ -1,0 +1,4 @@
+{
+  "tool": "claude",
+  "args": ["-p", "check test/ for issues", "--output-format", "text", "--max-turns", "2"]
+}
