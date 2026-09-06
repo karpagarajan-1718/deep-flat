@@ -1,0 +1,11 @@
+{
+  "name": "deep-flat",
+  "version": "1.0.0",
+  "description": "Recursive array flattening with configurable depth",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node test/index.test.js"
+  },
+  "keywords": ["array", "flatten", "recursive"],
+  "license": "MIT"
+}
