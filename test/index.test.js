@@ -1,22 +1,32 @@
 const assert = require('assert');
-const { flatten } = require('../src/index');
+const { flatten, flatMap } = require('../src/index');
 
-// depth=1 (default)
+// flatten depth=1 (default)
 assert.deepStrictEqual(flatten([1, [2, 3], [4, [5]]]), [1, 2, 3, 4, [5]]);
 
-// depth=Infinity
+// flatten depth=Infinity
 assert.deepStrictEqual(flatten([1, [2, [3, [4]]]], Infinity), [1, 2, 3, 4]);
 
-// already flat
+// flatten already flat
 assert.deepStrictEqual(flatten([1, 2, 3]), [1, 2, 3]);
 
-// empty
+// flatten empty
 assert.deepStrictEqual(flatten([]), []);
 
-// depth=0 returns shallow copy
+// flatten depth=0
 assert.deepStrictEqual(flatten([1, [2]], 0), [1, [2]]);
 
-// type check
+// flatMap basic
+assert.deepStrictEqual(flatMap([1, 2, 3], x => [x, x * 2]), [1, 2, 2, 4, 3, 6]);
+
+// flatMap with depth
+assert.deepStrictEqual(flatMap([1, 2], x => [[x]], 2), [1, 2]);
+
+// flatMap identity
+assert.deepStrictEqual(flatMap([1, 2, 3], x => x), [1, 2, 3]);
+
+// type checks
 try { flatten('not array'); assert.fail(); } catch(e) { assert(e instanceof TypeError); }
+try { flatMap([1], 'not fn'); assert.fail(); } catch(e) { assert(e instanceof TypeError); }
 
 console.log('All tests passed ✓');
