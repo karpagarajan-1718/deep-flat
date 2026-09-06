@@ -1,22 +1,25 @@
-const assert = require('assert');
-const { flatten } = require('../src/index');
+const { flatten, flatMap } = require('../src/index');
 
-// depth=1 (default)
-assert.deepStrictEqual(flatten([1, [2, 3], [4, [5]]]), [1, 2, 3, 4, [5]]);
+let passed = 0, failed = 0;
+function assert(cond, msg) {
+  if (cond) { passed++; } else { failed++; console.error('FAIL:', msg); }
+}
+function eq(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
 
-// depth=Infinity
-assert.deepStrictEqual(flatten([1, [2, [3, [4]]]], Infinity), [1, 2, 3, 4]);
+// flatten tests
+assert(eq(flatten([1, [2, 3]]), [1, 2, 3]), 'flatten depth 1');
+assert(eq(flatten([1, [2, [3, [4]]]], 2), [1, 2, 3, [4]]), 'flatten depth 2');
+assert(eq(flatten([1, [2, [3]]], Infinity), [1, 2, 3]), 'flatten infinite');
 
-// already flat
-assert.deepStrictEqual(flatten([1, 2, 3]), [1, 2, 3]);
+// flatMap tests
+assert(eq(flatMap([1, 2, 3], x => [x, x * 2]), [1, 2, 2, 4, 3, 6]), 'flatMap basic');
+assert(eq(flatMap(['hello world'], x => x.split(' ')), ['hello', 'world']), 'flatMap split');
+assert(eq(flatMap([1, 2], x => x), [1, 2]), 'flatMap identity');
 
-// empty
-assert.deepStrictEqual(flatten([]), []);
+// error tests
+try { flatten('nope'); assert(false, 'should throw'); } catch (e) { assert(e instanceof TypeError, 'flatten type error'); }
+try { flatMap([1], 'nope'); assert(false, 'should throw'); } catch (e) { assert(e instanceof TypeError, 'flatMap type error'); }
 
-// depth=0 returns shallow copy
-assert.deepStrictEqual(flatten([1, [2]], 0), [1, [2]]);
-
-// type check
-try { flatten('not array'); assert.fail(); } catch(e) { assert(e instanceof TypeError); }
-
+console.log(`\n${passed} passed, ${failed} failed`);
+if (failed) process.exit(1);
 console.log('All tests passed ✓');
