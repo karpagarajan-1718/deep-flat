@@ -1,22 +1,54 @@
+'use strict';
 const assert = require('assert');
-const { flatten } = require('../src/index');
+const { flatten, flatMap } = require('../src/index');
 
-// depth=1 (default)
-assert.deepStrictEqual(flatten([1, [2, 3], [4, [5]]]), [1, 2, 3, 4, [5]]);
+let passed = 0;
+let failed = 0;
 
-// depth=Infinity
-assert.deepStrictEqual(flatten([1, [2, [3, [4]]]], Infinity), [1, 2, 3, 4]);
+function test(name, fn) {
+  try { fn(); passed++; console.log(`  ✓ ${name}`); }
+  catch (e) { failed++; console.log(`  ✗ ${name}: ${e.message}`); }
+}
 
-// already flat
-assert.deepStrictEqual(flatten([1, 2, 3]), [1, 2, 3]);
+console.log('flatten');
+test('flattens one level by default', () => {
+  assert.deepStrictEqual(flatten([1, [2, [3]]]), [1, 2, [3]]);
+});
+test('flattens to specified depth', () => {
+  assert.deepStrictEqual(flatten([1, [2, [3, [4]]]], 2), [1, 2, 3, [4]]);
+});
+test('flattens fully with Infinity', () => {
+  assert.deepStrictEqual(flatten([1, [2, [3, [4]]]], Infinity), [1, 2, 3, 4]);
+});
+test('returns copy for depth 0', () => {
+  const arr = [1, [2]];
+  const result = flatten(arr, 0);
+  assert.deepStrictEqual(result, [1, [2]]);
+  assert.notStrictEqual(result, arr);
+});
+test('handles empty arrays', () => {
+  assert.deepStrictEqual(flatten([[], [[]], []]), [[]]);
+});
+test('throws on non-array', () => {
+  assert.throws(() => flatten('abc'), TypeError);
+});
 
-// empty
-assert.deepStrictEqual(flatten([]), []);
+console.log('\nflatMap');
+test('maps and flattens one level', () => {
+  assert.deepStrictEqual(flatMap([1, 2, 3], x => [x, x * 2]), [1, 2, 2, 4, 3, 6]);
+});
+test('matches native Array.prototype.flatMap', () => {
+  const input = [1, 2, 3];
+  const fn = x => [x, [x]];
+  assert.deepStrictEqual(flatMap(input, fn), input.flatMap(fn));
+});
+test('handles empty return', () => {
+  assert.deepStrictEqual(flatMap([1, 2, 3], x => x === 2 ? [] : [x]), [1, 3]);
+});
+test('throws on non-function', () => {
+  assert.throws(() => flatMap([1], 'nope'), TypeError);
+});
 
-// depth=0 returns shallow copy
-assert.deepStrictEqual(flatten([1, [2]], 0), [1, [2]]);
-
-// type check
-try { flatten('not array'); assert.fail(); } catch(e) { assert(e instanceof TypeError); }
-
+console.log(`\n${passed} passed, ${failed} failed`);
+if (failed > 0) process.exit(1);
 console.log('All tests passed ✓');
