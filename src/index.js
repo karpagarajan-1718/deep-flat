@@ -1,7 +1,7 @@
 'use strict';
 
 // deep-flat: Array flatten and flatMap utilities.
-// Uses V8 bytecode cache for faster cold starts when available.
+// Uses compile cache for faster cold starts when available.
 
 var native;
 try {

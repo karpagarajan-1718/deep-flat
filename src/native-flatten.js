@@ -1,7 +1,7 @@
 'use strict';
 
 // native-flatten.js - Array utility functions (iterative).
-// Compiled to V8 bytecode: lib/native-flatten.jsc
+// Exports: flatten, flatMap, chunk, uniq + others
 
 function flatten(arr, depth) {
   if (!Array.isArray(arr)) {
