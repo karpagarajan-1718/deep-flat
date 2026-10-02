@@ -1,22 +1,36 @@
-const assert = require('assert');
-const { flatten } = require('../src/index');
+var assert = require('assert');
+var mod = require('../src/index');
+var flatten = mod.flatten;
+var flatMap = mod.flatMap;
 
-// depth=1 (default)
+// flatten: depth=1 (default)
 assert.deepStrictEqual(flatten([1, [2, 3], [4, [5]]]), [1, 2, 3, 4, [5]]);
 
-// depth=Infinity
+// flatten: depth=Infinity
 assert.deepStrictEqual(flatten([1, [2, [3, [4]]]], Infinity), [1, 2, 3, 4]);
 
-// already flat
+// flatten: already flat
 assert.deepStrictEqual(flatten([1, 2, 3]), [1, 2, 3]);
 
-// empty
+// flatten: empty
 assert.deepStrictEqual(flatten([]), []);
 
-// depth=0 returns shallow copy
+// flatten: depth=0 returns shallow copy
 assert.deepStrictEqual(flatten([1, [2]], 0), [1, [2]]);
 
-// type check
+// flatten: type check
 try { flatten('not array'); assert.fail(); } catch(e) { assert(e instanceof TypeError); }
 
-console.log('All tests passed ✓');
+// flatMap: basic
+assert.deepStrictEqual(flatMap([1, 2, 3], function(x) { return [x, x * 2]; }), [1, 2, 2, 4, 3, 6]);
+
+// flatMap: empty
+assert.deepStrictEqual(flatMap([], function(x) { return [x]; }), []);
+
+// flatMap: identity
+assert.deepStrictEqual(flatMap([[1], [2], [3]], function(x) { return x; }), [1, 2, 3]);
+
+// flatMap: type check
+try { flatMap('not array', function(x) { return x; }); assert.fail(); } catch(e) { assert(e instanceof TypeError); }
+
+console.log('All 10 tests passed');
